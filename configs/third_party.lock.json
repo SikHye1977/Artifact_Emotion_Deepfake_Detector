@@ -1,0 +1,9 @@
+{
+  "policy": "Only unmodified upstream checkouts under third_party may be imported.",
+  "aasist": {
+    "upstream": "https://github.com/clovaai/aasist",
+    "commit": "a04c9863f63d44471dde8a6abcb3b082b07cd1d1",
+    "path": "third_party/aasist",
+    "status": "cloned_unmodified"
+  }
+}

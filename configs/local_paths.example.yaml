@@ -1,0 +1,6 @@
+# Copy this file to configs/local_paths.yaml on each machine.  The local file is ignored.
+# Paths are machine-specific and are never imported by shared Python modules.
+datasets_root: /absolute/path/to/deepfake-research/datasets
+fav_root: /absolute/path/to/deepfake-research/datasets/FakeAVCeleb_v1.2
+checkpoints_root: /absolute/path/to/checkpoints
+third_party_root: /absolute/path/to/Artifact-Emotion-Deepfake-Detector/third_party

@@ -1,0 +1,96 @@
+experiment:
+  id: x3a_reproduction/fav_indomain_v1/aasist_4gpu
+  stage: paper_spec_reimplementation
+  seed: 42
+data:
+  dataset: FAV
+  split_manifest: configs/fixed_manifests.json
+  eligibility: configs/phase0_data_quality_v1.json
+  split:
+    train: train
+    selection: dev
+    final_evaluation: test
+  task:
+    label: audio_label
+    label_mask: audio_label_mask
+third_party:
+  repository: clovaai/aasist
+  commit: a04c9863f63d44471dde8a6abcb3b082b07cd1d1
+  path: third_party/aasist
+model:
+  name: aasist
+  pretrained_checkpoint: null
+  class_mapping:
+    real: 0
+    fake: 1
+  fake_class_index: 1
+  output: two_class_logits
+  official_config:
+    first_conv: 128
+    filts:
+    - 70
+    - - 1
+      - 32
+    - - 32
+      - 32
+    - - 32
+      - 64
+    - - 64
+      - 64
+    gat_dims:
+    - 64
+    - 32
+    pool_ratios:
+    - 0.5
+    - 0.7
+    - 0.5
+    - 0.5
+    temperatures:
+    - 2.0
+    - 2.0
+    - 100.0
+    - 100.0
+audio:
+  sample_rate: 16000
+  channels: mono
+  length_policy: pad_to_eligible_train_max
+  target_num_samples: 284672
+  truncation: prohibited
+  padding: right_zero_pad
+training:
+  batch_size: 4
+  per_device_batch_size: 4
+  global_effective_batch_size: 16
+  gradient_accumulation_steps: 1
+  epochs: 20
+  optimizer:
+    name: adam
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+  scheduler:
+    name: cosine
+  loss:
+    name: cross_entropy
+  sampler:
+    name: balanced
+    replacement: true
+    global_epoch_samples: 14724
+    label: audio_label
+  frequency_augmentation: false
+  mixed_precision: false
+checkpoint_selection:
+  split: dev
+  metric: roc_auc
+  mode: max
+outputs:
+  report_dir: reports/experiments/x3a_reproduction/fav_indomain_v1/unified_4gpu
+  checkpoint_dir: checkpoints/experiments/x3a_reproduction/fav_indomain_v1/unified_4gpu
+distributed:
+  backend: nccl
+  world_size: 4
+  devices:
+  - 0
+  - 1
+  - 2
+  - 3
+  find_unused_parameters: false

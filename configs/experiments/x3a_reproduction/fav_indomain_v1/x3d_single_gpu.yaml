@@ -1,0 +1,77 @@
+experiment:
+  id: x3a_reproduction/fav_indomain_v1/x3d_single_gpu
+  stage: paper_spec_reimplementation
+  seed: 42
+data:
+  dataset: FAV
+  split_manifest: configs/fixed_manifests.json
+  eligibility: configs/phase0_data_quality_v1.json
+  split:
+    train: train
+    selection: dev
+    final_evaluation: test
+  task:
+    label: video_label
+    label_mask: video_label_mask
+model:
+  name: x3d_m
+  pretrained: true
+  freeze_backbone: false
+  output: binary_fake_logit
+video:
+  num_frames: 128
+  sampling: uniform_over_full_video
+  resize_short_side: 256
+  crop_size: 256
+  normalization:
+    mean:
+    - 0.45
+    - 0.45
+    - 0.45
+    std:
+    - 0.225
+    - 0.225
+    - 0.225
+training:
+  batch_size: 1
+  per_device_batch_size: 1
+  global_effective_batch_size: 8
+  gradient_accumulation_steps: 8
+  amp_min_scale: 1.0
+  max_consecutive_overflows: 5
+  required_gradient_parameters:
+  - backbone.blocks.5.proj.weight
+  - backbone.blocks.5.proj.bias
+  gradient_clip_norm: null
+  recovery_interval_steps: 200
+  epochs: 20
+  optimizer:
+    name: adamw
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+  scheduler:
+    name: cosine
+  loss:
+    name: bce_with_logits
+  sampler:
+    name: balanced
+    replacement: true
+    global_epoch_samples: 14724
+    label: video_label
+  mixed_precision: true
+  amp_initial_scale: 16384
+checkpoint_selection:
+  split: dev
+  metric: roc_auc
+  mode: max
+outputs:
+  report_dir: reports/experiments/x3a_reproduction/fav_indomain_v1/unified_single_gpu
+  checkpoint_dir: checkpoints/experiments/x3a_reproduction/fav_indomain_v1/unified_single_gpu
+thermal:
+  stop_enabled: false
+  warning_temperature_c: 80
+  critical_temperature_c: 85
+  emergency_log_temperature_c: 88
+  emergency_stop_temperature_c: 88
+  required_consecutive_samples: 1
+  telemetry_interval_seconds: 10

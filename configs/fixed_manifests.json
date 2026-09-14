@@ -1,0 +1,39 @@
+{
+  "version": "fixed-splits-v1",
+  "seed": 42,
+  "training_started": false,
+  "datasets": {
+    "FAV": {
+      "manifest": "reports/fixed_splits_v1_release/FAV/split_manifest.jsonl",
+      "sha256": "fffbc3fd18e7f77b2d62d10228d329c28f496ae7289b96b035752d926fe11907",
+      "summary": "reports/fixed_splits_v1_release/FAV/split_summary.json",
+      "summary_sha256": "9a3d7c10766829c0adeb08628c9e6ebde0949d4510730c1e90f2b46994dd028f"
+    },
+    "AVDF1M": {
+      "manifest": "reports/fixed_splits_v1_release/AVDF1M/split_manifest.jsonl",
+      "sha256": "5b602b91ca91c8fcd316801ddffb0e9b641ea5bf889afc0f610dc0f997cbd826",
+      "summary": "reports/fixed_splits_v1_release/AVDF1M/split_summary.json",
+      "summary_sha256": "a0a2ff09d1f466abf9ab86737d6a0aade9152ff05892a4fd0d08081325b1636d"
+    },
+    "PGF": {
+      "manifest": "reports/fixed_splits_v1_release/PGF/split_manifest.jsonl",
+      "sha256": "d10cfb9a7bdf35996161fa1a484e9d85306c69304f81cf2795685c5a6a93c0e1",
+      "summary": "reports/fixed_splits_v1_release/PGF/split_summary.json",
+      "summary_sha256": "144d3dac65a7283dfd9de084db67d3c1cd38354f8387f1d7643d4c287378e422"
+    }
+  },
+  "consumers": [
+    "X3D",
+    "AASIST",
+    "HSEmotion",
+    "CRNN",
+    "fusion"
+  ],
+  "rule": "All consumers use these exact manifests; label filtering never changes split assignment.",
+  "official_avdf_test_exclusion": {
+    "file_list": "/home/hdd1/sikhye/deepfake-research/datasets/AV-Deepfake1M_archives/test_files.txt",
+    "sha256": "3b39fc5da247396a7d8c197105f52d6bed27c338cfc51245ad86e123cc0b3f43",
+    "listed_files": 343240,
+    "reason": "No labels; not in any supervised split manifest."
+  }
+}

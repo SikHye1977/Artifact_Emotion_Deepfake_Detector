@@ -1,0 +1,8 @@
+{
+  "version": "phase0-data-quality-v1",
+  "fixed_manifest_registry": "configs/fixed_manifests.json",
+  "fixed_manifest_registry_sha256": "b92eab4ca6854bfefdd427dbcb1d9811d04ee84915c413233263844f438ac41a",
+  "eligibility_manifest": "reports/phase0_v1/eligibility_v4.jsonl",
+  "eligibility_manifest_sha256": "8a0e1002aada3c30ff62a7186139f32ae3914e028880b46c722379dec13a0d16",
+  "policy": "All downstream loaders must verify configs/fixed_manifests.json and use this sample_id eligibility record. Neither file permits changing a frozen split assignment."
+}

@@ -1,0 +1,12 @@
+# Python 3.10; install CUDA torch wheels first (QUICKSTART.md).
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+pytorchvideo==0.1.5
+av==12.3.0
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+scipy==1.14.1
+scikit-learn==1.5.2
+PyYAML==6.0.2
+soundfile==0.12.1
