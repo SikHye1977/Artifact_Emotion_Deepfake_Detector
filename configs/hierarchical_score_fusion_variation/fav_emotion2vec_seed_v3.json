@@ -1,0 +1,8 @@
+{
+  "audio_model": "emotion2vec_plus_seed",
+  "seed_snapshot": "REPLACE_WITH_DOWNLOADED_EMOTION2VEC_PLUS_SEED_SNAPSHOT",
+  "video_classes": 8,
+  "audio_classes": 9,
+  "window_seconds": 3,
+  "hop_seconds": 1
+}

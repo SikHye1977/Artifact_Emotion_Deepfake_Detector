@@ -1,0 +1,43 @@
+experiment:
+  id: x3a_reproduction/fav_indomain_v1/x3a_or
+  stage: paper_spec_reimplementation
+  seed: 42
+
+data:
+  dataset: FAV
+  split_manifest: configs/fixed_manifests.json
+  eligibility: configs/phase0_data_quality_v1.json
+  task:
+    label: clip_label
+    label_mask: clip_label_mask
+  evaluation_splits: [dev, test]
+
+inputs:
+  x3d_config: configs/experiments/x3a_reproduction/fav_indomain_v1/x3d.yaml
+  aasist_config: configs/experiments/x3a_reproduction/fav_indomain_v1/aasist.yaml
+  x3d_checkpoint: null
+  aasist_checkpoint: null
+  aasist_fake_class_index: 1
+
+fusion:
+  name: probabilistic_or
+  formula: "1 - (1 - p_video_fake) * (1 - p_audio_fake)"
+  trainable: false
+  calibration: none
+
+evaluation:
+  primary_metrics:
+    - roc_auc
+    - average_precision
+    - balanced_accuracy
+    - macro_f1
+    - mcc
+  fixed_threshold: 0.5
+  dev_selected_threshold:
+    enabled: true
+    objective: balanced_accuracy
+    apply_to: test
+  save_predictions: true
+
+outputs:
+  report_dir: reports/experiments/x3a_reproduction/fav_indomain_v1/x3a_or

@@ -1,0 +1,8 @@
+{
+  "x3d_checkpoint": "checkpoints/experiments/x3a_reproduction/fav_indomain_v1/unified_4gpu/x3a_4gpu_001/x3d/best.pt",
+  "aasist_checkpoint": "checkpoints/experiments/x3a_reproduction/fav_indomain_v1/unified_4gpu/x3a_4gpu_001/aasist/best.pt",
+  "acrnn_checkpoint": "checkpoints/pretrained/ser_acrnn.pth",
+  "acrnn_source": "third_party/amsdf_acrnn/ACRNN.py",
+  "acrnn_state_dict_key": null,
+  "group_key": "source_id"
+}
