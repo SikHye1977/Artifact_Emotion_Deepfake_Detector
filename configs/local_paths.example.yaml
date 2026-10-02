@@ -1,6 +1,18 @@
-# Copy this file to configs/local_paths.yaml on each machine.  The local file is ignored.
-# Paths are machine-specific and are never imported by shared Python modules.
-datasets_root: /absolute/path/to/deepfake-research/datasets
-fav_root: /absolute/path/to/deepfake-research/datasets/FakeAVCeleb_v1.2
-checkpoints_root: /absolute/path/to/checkpoints
-third_party_root: /absolute/path/to/Artifact-Emotion-Deepfake-Detector/third_party
+# Copy to local_paths.yaml; this does not edit any frozen manifest.
+datasets_root: D:/datasets
+fav_root: D:/datasets/FakeAVCeleb_v1.2
+avdf1m_root: D:/datasets/AV-Deepfake1M
+pgf_root: D:/datasets/PolyGlotFake
+checkpoints_root: checkpoints
+third_party_root: third_party
+ffmpeg: null  # PATH or the imageio-ffmpeg binary in .venv
+relocation_audit: reports/migration/windows_media_relocation.jsonl
+emotion2vec_snapshot: checkpoints/pretrained/emotion2vec_plus_seed/7be9a30d52bdc793cc24e6f7d25358d6648927c1
+hsemotion_checkpoint: checkpoints/pretrained/hsemotion/enet_b0_8_best_afew.pt
+media_roots:
+  - source: /home/hdd1/sikhye/deepfake-research/datasets/FakeAVCeleb_v1.2
+    target: D:/datasets/FakeAVCeleb_v1.2
+  - source: /home/hdd1/sikhye/deepfake-research/datasets/AV-Deepfake1M
+    target: D:/datasets/AV-Deepfake1M
+  - source: /home/hdd1/sikhye/deepfake-research/datasets/PolyGlotFake/PolyGlotFake
+    target: D:/datasets/PolyGlotFake

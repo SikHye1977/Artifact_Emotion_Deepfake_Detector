@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import torch
 from .transforms import pad_audio
+from src.utils.local_paths import ffmpeg_executable
 
 @dataclass(frozen=True)
 class MediaConfig:
@@ -66,7 +67,7 @@ def read_audio(path,cfg):
     with av.open(str(path)) as container:
         if not container.streams.audio:return torch.empty(0,dtype=torch.float32),False
         if container.duration is not None and container.duration/av.time_base>cfg.max_duration:raise ValueError('Audio duration guard exceeded')
-    p=subprocess.run(['ffmpeg','-v','error','-xerror','-threads','1','-i',str(path),'-map','0:a:0','-vn',
+    p=subprocess.run([ffmpeg_executable(),'-v','error','-xerror','-threads','1','-i',str(path),'-map','0:a:0','-vn',
                       '-ac','1','-ar',str(cfg.sample_rate),'-f','f32le','-'],capture_output=True,timeout=120,check=True)
     data=np.frombuffer(p.stdout,dtype='<f4').copy()
     if len(data)==0 or not np.isfinite(data).all():raise ValueError('Empty or nonfinite audio')

@@ -5,6 +5,7 @@ from pathlib import Path
 import torch
 from torch.utils.data import Dataset
 from .media import MediaConfig,read_video,read_audio
+from src.utils.local_paths import MediaFileVerifier, resolve_media_path
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -13,33 +14,34 @@ class FrozenMediaDataset(Dataset):
         if split not in ('train','dev','test') or task not in ('video','audio','paired'):raise ValueError('Invalid split/task')
         if eligibility_path is None:raise ValueError('Explicit sample-id eligibility required; uninspected files are not approved')
         self.config=config or MediaConfig();self.rows=[];self.task=task
+        self.verifier=MediaFileVerifier(eligibility_path)
         reg=Path(registry) if registry else ROOT/'configs/fixed_manifests.json'
-        entry=json.loads(reg.read_text())['datasets'][dataset];manifest=ROOT/entry['manifest']
+        entry=json.loads(reg.read_text(encoding='utf-8'))['datasets'][dataset];manifest=ROOT/entry['manifest']
         digest=hashlib.sha256()
         with manifest.open('rb') as f:
             for block in iter(lambda:f.read(1024*1024),b''):digest.update(block)
         if digest.hexdigest()!=entry['sha256']:raise ValueError('Frozen manifest hash mismatch')
         evidence={}
-        with Path(eligibility_path).open() as f:
+        with Path(eligibility_path).open(encoding='utf-8') as f:
             for line in f:
                 r=json.loads(line)
                 if r['manifest_sha256']!=entry['sha256'] and r['dataset']==dataset:raise ValueError('Eligibility manifest mismatch')
                 if r['dataset']==dataset:evidence[r['sample_id']]=r
         selected=set(sample_ids) if sample_ids is not None else None
-        with manifest.open() as f:
+        with manifest.open(encoding='utf-8') as f:
             for line in f:
                 r=json.loads(line)
                 if r['split']!=split or (selected is not None and r['sample_id'] not in selected):continue
                 e=evidence.get(r['sample_id'])
                 if e is None or not e['eligible'][task]:continue
-                self.rows.append(dict(sample_id=r['sample_id'],path=r['video_path'],split=split,dataset=dataset,
+                self.rows.append(dict(sample_id=r['sample_id'],path=str(resolve_media_path(r['video_path'], self.verifier.config)),source_path=r['video_path'],split=split,dataset=dataset,
                     labels=[r['clip_label'],r['video_label'],r['audio_label']],size=e['size'],mtime_ns=e['mtime_ns']))
         if selected is not None and {r['sample_id'] for r in self.rows}!=selected:
             raise ValueError('Requested samples not all eligible in this fixed split')
     def __len__(self):return len(self.rows)
     def __getitem__(self,index):
-        row=self.rows[index];st=Path(row['path']).stat()
-        if st.st_size!=row['size'] or st.st_mtime_ns!=row['mtime_ns']:raise ValueError('Media changed after quality audit')
+        row=self.rows[index]
+        self.verifier.verify(row)
         output=dict(row)
         if self.task!='audio':output.update(read_video(row['path'],self.config))
         else:

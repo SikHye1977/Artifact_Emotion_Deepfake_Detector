@@ -13,13 +13,13 @@ from torch import nn
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT))
-from src.models.emotion_deepfake_head import EmotionDeepfakeHead, masked_mean
-from src.fusion.hierarchical_score_fusion import probabilistic_or, HierarchicalScoreFusion
-from src.branches.hierarchical_artifact_branch import HierarchicalArtifactBranch
-from src.branches.hierarchical_emotion_branch import HierarchicalEmotionBranch
-from src.datasets.hierarchical_emotion_inputs import audio_window_starts
-from src.datasets.hierarchical_emotion_inputs import audio_features, video_features
-spec=importlib.util.spec_from_file_location('runner',ROOT/'scripts/hierarchical_score_fusion_script.py')
+from src.models.hierarchical_score_fusion.emotion_deepfake_head import EmotionDeepfakeHead, masked_mean
+from src.fusion.hierarchical_score_fusion.hierarchical_score_fusion import probabilistic_or, HierarchicalScoreFusion
+from src.branches.hierarchical_score_fusion.hierarchical_artifact_branch import HierarchicalArtifactBranch
+from src.branches.hierarchical_score_fusion.hierarchical_emotion_branch import HierarchicalEmotionBranch
+from src.datasets.hierarchical_score_fusion.hierarchical_emotion_inputs import audio_window_starts
+from src.datasets.hierarchical_score_fusion.hierarchical_emotion_inputs import audio_features, video_features
+spec=importlib.util.spec_from_file_location('runner',ROOT/'scripts/hierarchical_score_fusion/hierarchical_score_fusion_scripts.py')
 runner=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
 
@@ -204,7 +204,7 @@ class Tests(unittest.TestCase):
                 runner.write_json(path/'manifest.json',dict(format='hierarchical_cache_v1',split=split,dataset='FAV',n=16,
                     recipe={'synthetic':True},recipe_sha256=runner.digest({'synthetic':True}),
                     cache_sha256=runner.sha256(path/'cache.npz')))
-            script=str(ROOT/'scripts/hierarchical_score_fusion_script.py')
+            script=str(ROOT/'scripts/hierarchical_score_fusion/hierarchical_score_fusion_scripts.py')
             result=subprocess.run([sys.executable,script,'train','--train-cache',str(tmp/'train'),
                '--dev-cache',str(tmp/'dev'),'--epochs','2','--output',str(tmp/'run')],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stderr)

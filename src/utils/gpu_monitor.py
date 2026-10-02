@@ -14,8 +14,8 @@ def snapshot():
     for values in csv.reader(output.splitlines()):
         row={key:value.strip() for key,value in zip(fields,values)}
         row['index']=int(row['index'])
-        if row['index'] in range(4):rows.append(row)
-    if len(rows)!=4:raise RuntimeError('Four GPU telemetry rows required')
+        rows.append(row)
+    if not rows:raise RuntimeError('No GPU telemetry rows returned')
     return rows
 
 
@@ -25,13 +25,13 @@ class ThermalPolicy:
         self.required_consecutive_samples=required_consecutive_samples;self.telemetry_interval_seconds=telemetry_interval_seconds
 
 class ThermalCounter:
-    def __init__(self,policy=None):self.policy=policy or ThermalPolicy();self.counts={i:0 for i in range(4)}
+    def __init__(self,policy=None):self.policy=policy or ThermalPolicy();self.counts={}
     def update(self,rows):
         warning=[];emergency=[]
         for row in rows:
             i=row['index'];temp=float(row['temperature.gpu'])
             if temp>=self.policy.warning_temperature_c: warning.append(i)
-            self.counts[i]=self.counts[i]+1 if temp>=self.policy.emergency_stop_temperature_c else 0
+            self.counts[i]=self.counts.get(i,0)+1 if temp>=self.policy.emergency_stop_temperature_c else 0
             if self.counts[i]>=self.policy.required_consecutive_samples: emergency.append(i)
         return {'warning_gpus':warning,'emergency_gpus':emergency,'emergency_stop':bool(emergency)}
 

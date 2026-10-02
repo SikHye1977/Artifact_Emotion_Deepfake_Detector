@@ -122,8 +122,7 @@ def run_training(config_path,project_root,task,step,*,dry_run=False,resume_check
     recipe=root/'reports/phase1_preflight/input_recipe.json'
     recipe_data=json.loads(recipe.read_text())
     if recipe_data['audio']['target_num_samples']!=284672:raise ValueError('Recipe mismatch')
-    local=yaml.safe_load((root/'configs/local_paths.yaml').read_text())
-    source_hashes={str(p.relative_to(root)):sha256(p) for p in sorted((root/'src').rglob('*.py'))}
+    source_hashes={p.relative_to(root).as_posix():sha256(p) for p in sorted((root/'src').rglob('*.py'))}
     weight_info={'initialization':'random','sha256':None}
     if task=='video':
         from src.models.x3d import X3DDeepfakeClassifier
@@ -134,7 +133,7 @@ def run_training(config_path,project_root,task,step,*,dry_run=False,resume_check
         state=torch.hub.load_state_dict_from_url(url,model_dir=str(cache),map_location='cpu',progress=True)
         weight_info={'url':url,'sha256':sha256(cache/'X3D_M.pyth'),'initialization':'Kinetics-400'}
         for p in sorted(Path(pytorchvideo.__file__).parent.rglob('*.py')):
-            source_hashes['pytorchvideo/'+str(p.relative_to(Path(pytorchvideo.__file__).parent))]=sha256(p)
+            source_hashes['pytorchvideo/'+p.relative_to(Path(pytorchvideo.__file__).parent).as_posix()]=sha256(p)
         def factory():
             model=X3DDeepfakeClassifier('x3d_m',pretrained=False,freeze_backbone=config['model']['freeze_backbone'])
             weights={k:v for k,v in state['model_state'].items() if not k.startswith('blocks.5.proj.')}
@@ -167,12 +166,9 @@ def run_training(config_path,project_root,task,step,*,dry_run=False,resume_check
     def dataset(split):
         ds=FrozenMediaDataset('FAV',split,media,eligibility_path=eligibility,task=task,registry=registry)
         ds.rows=[row for row in ds.rows if row['labels'][label_index] is not None]
-        # Relocate by dataset-relative category path without modifying the manifest.
-        for row in ds.rows:
-            relative=row['sample_id'].split(':',1)[1]
-            row['path']=str(Path(local['fav_root'])/relative)
         return ds
     train=dataset('train')
+    provenance['media_relocation']=train.verifier.provenance()
     if prepare_only:
         return dict(config=config,train=train,dataset=dataset,factory=factory,collate=collate,provenance=provenance)
     if 'distributed' in config and not dry_run and not overfit:
